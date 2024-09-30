@@ -24,12 +24,13 @@ function register() {
         });
 }
 
-// Load Dashboard
+// Load Dashboard Pemohon
 function loadDashboard() {
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             document.getElementById('login').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
 
             db.collection('permohonan').where('userId', '==', user.uid).onSnapshot((snapshot) => {
                 snapshot.forEach((doc) => {
@@ -41,6 +42,7 @@ function loadDashboard() {
                     } else {
                         document.getElementById('skLink').innerText = 'Belum diterbitkan';
                     }
+                    showNotifikasi(data.notifikasi);
                 });
             });
         } else {
@@ -50,39 +52,55 @@ function loadDashboard() {
     });
 }
 
-// Function to schedule exam
-function jadwalkanUjian(permohonanId, tanggalUjian) {
-    db.collection('permohonan').doc(permohonanId).update({
-        tanggalUjian: tanggalUjian,
-        status: 'Ujian Dijadwalkan'
-    }).then(() => {
-        alert('Ujian berhasil dijadwalkan!');
+// Show Pengajuan Form
+function showPengajuanForm() {
+    document.getElementById('pengajuanForm').style.display = 'block';
+}
+
+// Ajukan Permohonan
+function ajukanPermohonan() {
+    const namaPemohon = document.getElementById('namaPemohon').value;
+    const alamatPemohon = document.getElementById('alamatPemohon').value;
+    const nomorDokumen = document.getElementById('nomorDokumen').value;
+    const dokumen = document.getElementById('dokumen').files[0];
+
+    const userId = firebase.auth().currentUser.uid;
+
+    const storageRef = storage.ref();
+    const dokumenRef = storageRef.child(`dokumen/${dokumen.name}`);
+    dokumenRef.put(dokumen).then(() => {
+        dokumenRef.getDownloadURL().then((url) => {
+            db.collection('permohonan').add({
+                namaPemohon: namaPemohon,
+                alamatPemohon: alamatPemohon,
+                nomorDokumen: nomorDokumen,
+                userId: userId,
+                status: 'Menunggu Verifikasi',
+                dokumenUrl: url,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                notifikasi: 'Permohonan anda telah diajukan dan menunggu verifikasi.'
+            }).then(() => {
+                alert('Permohonan berhasil diajukan!');
+                document.getElementById('pengajuanForm').reset();
+                document.getElementById('pengajuanForm').style.display = 'none';
+                loadDashboard();
+            });
+        });
     }).catch((error) => {
-        console.error('Error penjadwalan ujian:', error);
+        console.error('Error mengupload dokumen:', error);
     });
 }
 
-// Function to assess exam result
-function beriPenilaian(permohonanId, penilaian) {
-    db.collection('permohonan').doc(permohonanId).update({
-        penilaian: penilaian,
-        status: penilaian === 'Lulus' ? 'Lulus Ujian' : 'Tidak Lulus Ujian'
-    }).then(() => {
-        alert('Penilaian berhasil diberikan!');
-    }).catch((error) => {
-        console.error('Error penilaian:', error);
-    });
+// Batal Pengajuan
+function cancelPengajuan() {
+    document.getElementById('pengajuanForm').style.display = 'none';
 }
 
-// Function to publish SK
-function terbitkanSK(permohonanId) {
-    db.collection('permohonan').doc(permohonanId).update({
-        status: 'SK Diterbitkan',
-        skUrl: 'https://example.com/sk.pdf' // URL for SK file
-    }).then(() => {
-        alert('SK berhasil diterbitkan!');
-    }).catch((error) => {
-        console.error('Error penerbitan SK:', error);
-    });
-                            }
-        
+// Load Dashboard Admin
+function loadAdminDashboard() {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+
+    db.collection('permohonan').onSnapshot((snapshot) => {
+        const permohonanList = document.getElementById('permohonan
+                                                       
