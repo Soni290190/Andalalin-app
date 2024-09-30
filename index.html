@@ -7,22 +7,52 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Perizinan Andalalin</h1>
-
-    <div id="login">
+    <header>
+        <h1>Perizinan Andalalin</h1>
+    </header>
+    
+    <!-- Login/Registration Form -->
+    <section id="login">
         <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
         <button onclick="login()">Login</button>
         <button onclick="register()">Register</button>
-    </div>
+    </section>
 
-    <div id="dashboard" style="display: none;">
+    <!-- Form Pengajuan Permohonan -->
+    <section id="formPengajuan" style="display: none;">
+        <h2>Ajukan Permohonan</h2>
+        <input type="text" id="nama" placeholder="Nama Lengkap" required>
+        <input type="text" id="instansi" placeholder="Instansi" required>
+        <input type="file" id="dokumen" placeholder="Upload Dokumen" required>
+        <button onclick="ajukanPermohonan()">Ajukan</button>
+    </section>
+
+    <!-- Dashboard Pemohon -->
+    <section id="dashboard" style="display: none;">
         <h2>Dashboard Pemohon</h2>
         <p>Status: <span id="statusPermohonan"></span></p>
+        <p>Verifikasi Dokumen: <span id="verifikasiDokumen"></span></p>
         <p>Tanggal Ujian: <span id="tanggalUjian"></span></p>
         <p>SK: <span id="skLink"></span></p>
-    </div>
+    </section>
+
+    <!-- Dashboard Admin (For Admin Only) -->
+    <section id="dashboardAdmin" style="display: none;">
+        <h2>Dashboard Admin</h2>
+        <table id="permohonanTable">
+            <thead>
+                <tr>
+                    <th>Nama Pemohon</th>
+                    <th>Instansi</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
 
     <script src="firebaseConfig.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
