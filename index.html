@@ -4,48 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perizinan Andalalin</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Perizinan Andalalin</h1>
-    </header>
-    
-    <main>
-        <section id="steps">
-            <div class="step">
-                <h2>Step 01: Pengajuan Permohonan</h2>
-                <p>Pemohon mengajukan permohonan perizinan.</p>
-            </div>
-            <div class="step">
-                <h2>Step 02: Verifikasi Dokumen</h2>
-                <p>Verifikasi dokumen dan persyaratan.</p>
-            </div>
-            <div class="step">
-                <h2>Step 03: Penjadwalan Uji Andalalin</h2>
-                <p>Penjadwalan uji dampak lalu lintas.</p>
-            </div>
-            <div class="step">
-                <h2>Step 04: Penilaian Andalalin</h2>
-                <p>Penilaian dampak lalu lintas.</p>
-            </div>
-            <div class="step">
-                <h2>Step 05: Pembayaran PNBP</h2>
-                <p>Pembayaran PNBP melalui billing.</p>
-            </div>
-            <div class="step">
-                <h2>Step 06: Draft SK</h2>
-                <p>Penyusunan draft Surat Keputusan.</p>
-            </div>
-            <div class="step">
-                <h2>Step 07: Penerbitan SK</h2>
-                <p>Pengesahan dan pengiriman SK.</p>
-            </div>
-        </section>
+    <h1>Perizinan Andalalin</h1>
 
-        <button id="applyButton">Ajukan Permohonan</button>
-    </main>
+    <div id="login">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <button onclick="register()">Register</button>
+    </div>
 
-    <script src="js/app.js"></script>
+    <div id="dashboard" style="display: none;">
+        <h2>Dashboard Pemohon</h2>
+        <p>Status: <span id="statusPermohonan"></span></p>
+        <p>Tanggal Ujian: <span id="tanggalUjian"></span></p>
+        <p>SK: <span id="skLink"></span></p>
+    </div>
+
+    <script src="firebaseConfig.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
