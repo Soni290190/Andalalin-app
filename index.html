@@ -8,7 +8,27 @@
 </head>
 <body>
     <h1>Pengajuan Perizinan Andalalin</h1>
-    
+
+    <!-- Form Registrasi -->
+    <div id="register-form">
+        <h2>Registrasi</h2>
+        <input type="text" id="register-nama" placeholder="Nama Lengkap" required>
+        <input type="email" id="register-email" placeholder="Email" required>
+        <input type="password" id="register-password" placeholder="Password" required>
+        <input type="password" id="register-confirm-password" placeholder="Konfirmasi Password" required>
+        <input type="text" id="register-instansi" placeholder="Instansi" required>
+        <input type="text" id="register-telp" placeholder="Nomor Telepon" required>
+        <button onclick="register()">Daftar</button>
+    </div>
+
+    <!-- Form Login -->
+    <div id="login-form">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+    </div>
+
     <!-- Form Pengajuan -->
     <div id="pengajuan-form">
         <h2>Ajukan Permohonan</h2>
@@ -17,19 +37,11 @@
         <input type="file" id="dokumen" required>
         <button onclick="submitForm()">Ajukan</button>
     </div>
-    
+
     <!-- Status Pengajuan -->
     <div id="status-pengajuan">
         <h2>Status Pengajuan</h2>
         <p id="status-info">Menunggu...</p>
-    </div>
-
-    <!-- Login -->
-    <div id="login-form">
-        <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="login()">Login</button>
     </div>
 
     <script src="firebase-config.js"></script>
