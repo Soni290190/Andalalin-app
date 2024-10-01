@@ -1,106 +1,58 @@
-// Firebase Authentication
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { ref, set, get, onValue } from "firebase/database";
+import { uploadBytes, ref as storageRef, getDownloadURL } from "firebase/storage";
+
+// Login Function
 function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    firebase.auth().signInWithEmailAndPassword(email, password)
+
+    signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            alert('Login berhasil!');
-            loadDashboard();
+            const user = userCredential.user;
+            console.log("Login successful");
         })
         .catch((error) => {
-            console.error('Error login:', error);
+            console.error("Error during login:", error);
         });
 }
 
-function register() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            alert('Registrasi berhasil!');
-        })
-        .catch((error) => {
-            console.error('Error registrasi:', error);
-        });
-}
-
-// Load Dashboard Pemohon
-function loadDashboard() {
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            document.getElementById('login').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-
-            db.collection('permohonan').where('userId', '==', user.uid).onSnapshot((snapshot) => {
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    document.getElementById('statusPermohonan').innerText = data.status;
-                    document.getElementById('tanggalUjian').innerText = data.tanggalUjian || 'Belum dijadwalkan';
-                    if (data.skUrl) {
-                        document.getElementById('skLink').innerHTML = `<a href="${data.skUrl}" download>Download SK</a>`;
-                    } else {
-                        document.getElementById('skLink').innerText = 'Belum diterbitkan';
-                    }
-                    showNotifikasi(data.notifikasi);
-                });
-            });
-        } else {
-            document.getElementById('login').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'none';
-        }
-    });
-}
-
-// Show Pengajuan Form
-function showPengajuanForm() {
-    document.getElementById('pengajuanForm').style.display = 'block';
-}
-
-// Ajukan Permohonan
-function ajukanPermohonan() {
-    const namaPemohon = document.getElementById('namaPemohon').value;
-    const alamatPemohon = document.getElementById('alamatPemohon').value;
-    const nomorDokumen = document.getElementById('nomorDokumen').value;
+// Submit Form
+function submitForm() {
+    const nama = document.getElementById('nama').value;
+    const lokasi = document.getElementById('lokasi').value;
     const dokumen = document.getElementById('dokumen').files[0];
 
-    const userId = firebase.auth().currentUser.uid;
-
-    const storageRef = storage.ref();
-    const dokumenRef = storageRef.child(`dokumen/${dokumen.name}`);
-    dokumenRef.put(dokumen).then(() => {
-        dokumenRef.getDownloadURL().then((url) => {
-            db.collection('permohonan').add({
-                namaPemohon: namaPemohon,
-                alamatPemohon: alamatPemohon,
-                nomorDokumen: nomorDokumen,
-                userId: userId,
-                status: 'Menunggu Verifikasi',
+    const userId = auth.currentUser.uid;
+    const docRef = storageRef(storage, 'dokumen/' + dokumen.name);
+    
+    uploadBytes(docRef, dokumen).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => {
+            set(ref(database, 'permohonan/' + userId), {
+                namaPemohon: nama,
+                lokasi: lokasi,
                 dokumenUrl: url,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                notifikasi: 'Permohonan anda telah diajukan dan menunggu verifikasi.'
-            }).then(() => {
-                alert('Permohonan berhasil diajukan!');
-                document.getElementById('pengajuanForm').reset();
-                document.getElementById('pengajuanForm').style.display = 'none';
-                loadDashboard();
+                status: "Menunggu Verifikasi"
             });
+            alert("Pengajuan berhasil!");
         });
-    }).catch((error) => {
-        console.error('Error mengupload dokumen:', error);
     });
 }
 
-// Batal Pengajuan
-function cancelPengajuan() {
-    document.getElementById('pengajuanForm').style.display = 'none';
+// Fetch Status Pengajuan
+function fetchStatus() {
+    const userId = auth.currentUser.uid;
+    const statusRef = ref(database, 'permohonan/' + userId);
+
+    onValue(statusRef, (snapshot) => {
+        const data = snapshot.val();
+        document.getElementById('status-info').innerText = data.status;
+    });
 }
 
-// Load Dashboard Admin
-function loadAdminDashboard() {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
-
-    db.collection('permohonan').onSnapshot((snapshot) => {
-        const permohonanList = document.getElementById('permohonan
-                                                       
+// Listen to auth changes
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        fetchStatus();
+    }
+});
